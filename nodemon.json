@@ -1,0 +1,7 @@
+{
+    "watch": ["dist/apps/api", ".env"],
+    "ext": "js,mjs,cjs,json,env",
+    "ignore": ["*.test.js"],
+    "exec": "node dist/apps/api/main.js"
+  }
+  

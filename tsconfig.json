@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+      "target": "ES6",
+      "module": "commonjs",
+      "jsx": "react",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
+      "baseUrl": "./",
+      "paths": {
+        "@app/*": ["apps/my-app/src/app/*"],
+        "@env/*": ["apps/my-app/src/environments/*"]
+      }
+    },
+    "include": ["apps/my-app/src/**/*.ts", "apps/my-app/src/**/*.tsx"],
+    "exclude": ["node_modules", "dist"]
+  }
+  
