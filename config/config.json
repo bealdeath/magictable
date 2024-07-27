@@ -1,0 +1,14 @@
+{
+  "development": {
+    "url": "postgres://postgres:Andy12987%21%40%23@localhost:5432/Magictable?charset=utf8",
+    "dialect": "postgres"
+  },
+  "test": {
+    "url": "postgres://postgres:Andy12987%21%40%23@localhost:5432/Magictable?charset=utf8",
+    "dialect": "postgres"
+  },
+  "production": {
+    "url": "postgres://postgres:Andy12987%21%40%23@localhost:5432/Magictable?charset=utf8",
+    "dialect": "postgres"
+  }
+}
