@@ -11,7 +11,7 @@ import userRoutes from './routes/users';
 import recordRoutes from './routes/records';
 
 const app = express();
-
+app.use(cors({ origin: 'http://localhost:4200' })); // Ensure CORS is set correctly
 app.use(cors());
 app.use(express.json());
 
