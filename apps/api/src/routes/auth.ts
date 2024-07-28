@@ -1,4 +1,3 @@
-// C:\Users\Andy\Downloads\testing\my-workspace\apps\api\src\routes\auth.ts
 import express, { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -35,7 +34,8 @@ router.post('/register', async (req: Request, res: Response) => {
 
     const user = await User.create({ firstName, lastName, email, password: hashedPassword, role });
 
-    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET as string, { expiresIn: '1h' });
+    const secret = process.env.JWT_SECRET || 'default_secret';
+    const token = jwt.sign({ id: user.id, role: user.role }, secret, { expiresIn: '1h' });
     console.log('User created successfully:', user);
     res.status(201).json({ user, token });
   } catch (error) {
@@ -68,7 +68,8 @@ router.post('/login', async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET as string, { expiresIn: '1h' });
+    const secret = process.env.JWT_SECRET || 'default_secret';
+    const token = jwt.sign({ id: user.id, role: user.role }, secret, { expiresIn: '1h' });
     console.log('User logged in successfully:', user);
     res.json({ token, role: user.role });
   } catch (error) {

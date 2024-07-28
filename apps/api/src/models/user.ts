@@ -2,6 +2,16 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
 import bcrypt from 'bcrypt';
 
+// Make sure process.env.DB_URI is defined
+if (!process.env.DB_URI) {
+  throw new Error("DB_URI environment variable is not defined");
+}
+
+const sequelize = new Sequelize(process.env.DB_URI, {
+  dialect: 'postgres',
+  logging: false, // Add other options if necessary
+});
+
 export class User extends Model {
   public id!: number;
   public firstName!: string;
