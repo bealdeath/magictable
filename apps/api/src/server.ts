@@ -10,6 +10,10 @@ import dataRoutes from './routes/data';
 import userRoutes from './routes/users';
 import recordRoutes from './routes/records';
 
+require('dotenv').config({
+  path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env',
+});
+
 const app = express();
 app.use(cors({ origin: 'http://localhost:4200' })); // Ensure CORS is set correctly
 app.use(cors());
@@ -23,6 +27,8 @@ app.use('/api/auth', (req, res, next) => {
 app.use('/api/data', dataRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/records', recordRoutes);
+
+
 
 sequelize.authenticate()
   .then(() => {

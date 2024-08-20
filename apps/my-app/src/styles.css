@@ -2,3 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 /* You can add global styles to this file, and also import other style files */
+:root {
+    --background-color: #ffffff;
+    --text-color: #000000;
+    --header-background-color: #f0f0f0;
+    --header-text-color: #000000;
+    --input-background-color: #ffffff;
+    --input-text-color: #000000;
+    --border-color: #cccccc;
+  }
+  
+  .dark-mode {
+    --background-color: #121212;
+    --text-color: #ffffff;
+    --header-background-color: #1f1f1f;
+    --header-text-color: #ffffff;
+    --input-background-color: #2c2c2c;
+    --input-text-color: #ffffff;
+    --border-color: #444444;
+  }
+  
+  body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+  }
+  
+  th {
+    background-color: var(--header-background-color);
+    color: var(--header-text-color);
+  }
+  
+  input {
+    background-color: var(--input-background-color);
+    color: var(--input-text-color);
+    border: 1px solid var(--border-color);
+  }
+  

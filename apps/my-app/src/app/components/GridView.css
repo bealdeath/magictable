@@ -1,0 +1,35 @@
+.table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    padding: 10px;
+    border: 1px solid black;
+    text-align: left;
+  }
+  
+  .resizer {
+    display: inline-block;
+    width: 10px;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translateX(50%);
+    cursor: col-resize;
+  }
+  
+  th {
+    position: relative;
+  }
+  
+  th > div {
+    display: flex;
+    align-items: center;
+  }
+  
+  th > div > .resizer {
+    height: 100%;
+  }
+  

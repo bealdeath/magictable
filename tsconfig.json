@@ -7,10 +7,12 @@
       "esModuleInterop": true,
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true,
+      "outDir": "./dist",
       "baseUrl": "./",
       "paths": {
         "@app/*": ["apps/my-app/src/app/*"],
-        "@env/*": ["apps/my-app/src/environments/*"]
+        "@env/*": ["apps/my-app/src/environments/*"],
+        "@api/*": ["apps/api/src/*"]
       }
     },
     "include": ["apps/my-app/src/**/*.ts", "apps/my-app/src/**/*.tsx","apps/api/src/**.*.ts"],
