@@ -1,7 +1,5 @@
-// File: C:\Users\Andy\Downloads\testing\my-workspace\apps\my-app\src\app\components\Dashboard.tsx
-
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { Link } from 'react-router-dom';
 
 interface Record {
@@ -42,17 +40,14 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
   const [search, setSearch] = useState<string>('');
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [role, setRole] = useState<string>(userRole);
   const [table, setTable] = useState<string>('records'); // Default table to 'records'
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        setRole(userRole);
-        console.log('User role:', userRole);
         const response = await axios.get(`http://localhost:5000/api/data/${table}`, {
-          headers: { Authorization: 'Bearer ' + token },
+          headers: { Authorization: `Bearer ${token}` },
           params: { sortField, sortOrder, page, search },
         });
 
@@ -74,14 +69,22 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
           setUsers(response.data.records);
         }
         setTotalPages(response.data.totalPages);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error fetching data:', error);
-        alert('Error fetching data');
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            alert(`Error fetching data: ${error.response.data.message}`);
+          } else {
+            alert('Error fetching data. Please try again later.');
+          }
+        } else {
+          alert('Unexpected error occurred. Please try again later.');
+        }
       }
     };
 
     fetchData();
-  }, [sortField, sortOrder, page, search, userRole, table]);
+  }, [sortField, sortOrder, page, search, table]);
 
   const handleSort = (field: string) => {
     const order = sortOrder === 'ASC' ? 'DESC' : 'ASC';
@@ -89,19 +92,15 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
     setSortOrder(order);
   };
 
-  const handleEdit = (record: Record) => {
-    setEditRecord(record);
-  };
+  const handleEdit = (record: Record) => setEditRecord(record);
 
-  const handleEditUser = (user: User) => {
-    setEditUser(user);
-  };
+  const handleEditUser = (user: User) => setEditUser(user);
 
   const handleDelete = async (id: number) => {
     try {
       const token = localStorage.getItem('token');
       await axios.delete(`http://localhost:5000/api/data/${table}/${id}`, {
-        headers: { Authorization: 'Bearer ' + token },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (table === 'records') {
         setRecords(records.filter((record) => record.id !== id));
@@ -109,9 +108,17 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
         setUsers(users.filter((user) => user.id !== id));
       }
       alert('Record deleted successfully');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error deleting record:', error);
-      alert('Error deleting record');
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          alert(`Error deleting record: ${error.response.data.message}`);
+        } else {
+          alert('Error deleting record. Please try again later.');
+        }
+      } else {
+        alert('Unexpected error occurred. Please try again later.');
+      }
     }
   };
 
@@ -121,24 +128,30 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
       const token = localStorage.getItem('token');
       if (table === 'records' && editRecord) {
         await axios.put(`http://localhost:5000/api/data/${table}/${editRecord.id}`, editRecord, {
-          headers: { Authorization: 'Bearer ' + token },
+          headers: { Authorization: `Bearer ${token}` },
         });
+        setRecords(records.map((record) => (record.id === editRecord.id ? editRecord : record)));
         setEditRecord(null);
-        const updatedRecords = records.map((record) => (record.id === editRecord.id ? editRecord : record));
-        setRecords(updatedRecords);
         alert('Record updated successfully');
       } else if (table === 'users' && editUser) {
         await axios.put(`http://localhost:5000/api/data/${table}/${editUser.id}`, editUser, {
-          headers: { Authorization: 'Bearer ' + token },
+          headers: { Authorization: `Bearer ${token}` },
         });
+        setUsers(users.map((user) => (user.id === editUser.id ? editUser : user)));
         setEditUser(null);
-        const updatedUsers = users.map((user) => (user.id === editUser.id ? editUser : user));
-        setUsers(updatedUsers);
         alert('User updated successfully');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error updating record:', error);
-      alert('Error updating record');
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          alert(`Error updating record: ${error.response.data.message}`);
+        } else {
+          alert('Error updating record. Please try again later.');
+        }
+      } else {
+        alert('Unexpected error occurred. Please try again later.');
+      }
     }
   };
 
@@ -163,15 +176,23 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(`http://localhost:5000/api/data/${table}`, newRecord, {
-        headers: { Authorization: 'Bearer ' + token },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setRecords([...records, response.data]);
       setNewRecord({ content: {}, tableId: 1 });
       setShowAddForm(false);
       alert('Record added successfully');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error adding record:', error);
-      alert('Error adding record');
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          alert(`Error adding record: ${error.response.data.message}`);
+        } else {
+          alert('Error adding record. Please try again later.');
+        }
+      } else {
+        alert('Unexpected error occurred. Please try again later.');
+      }
     }
   };
 
@@ -196,7 +217,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
           <option value="ASC">Ascending</option>
           <option value="DESC">Descending</option>
         </select>
-        <button onClick={() => {}}>Apply Sort</button>
+        <button onClick={() => handleSort(sortField)}>Apply Sort</button>
       </div>
 
       <div>
@@ -206,7 +227,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
 
       {/* Navigation to Grid View */}
       <div style={{ marginTop: '20px' }}>
-        <Link to="/grid-view" style={{ textDecoration: 'none', color: 'white' }}>
+        <Link to="/grid-view" style={{ textDecoration: 'none' }}>
           <button
             style={{
               padding: '10px 20px',
@@ -221,6 +242,9 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
         </Link>
       </div>
 
+      {records.length === 0 && table === 'records' && <p>No records found.</p>}
+      {users.length === 0 && table === 'users' && <p>No users found.</p>}
+
       <table>
         <thead>
           <tr>
@@ -229,7 +253,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
                 {column}
               </th>
             ))}
-            {(role === 'admin' || role === 'editor') && <th>Actions</th>}
+            {(userRole === 'admin' || userRole === 'editor') && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -239,10 +263,12 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
                 {columns.map((column) => (
                   <td key={column}>{record.content[column]}</td>
                 ))}
-                {(role === 'admin' || role === 'editor') && (
+                {(userRole === 'admin' || userRole === 'editor') && (
                   <td>
                     <button onClick={() => handleEdit(record)}>Edit</button>
-                    {role === 'admin' && <button onClick={() => handleDelete(record.id)}>Delete</button>}
+                    {userRole === 'admin' && (
+                      <button onClick={() => handleDelete(record.id)}>Delete</button>
+                    )}
                   </td>
                 )}
               </tr>
@@ -253,10 +279,12 @@ const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
                 {columns.map((column) => (
                   <td key={column}>{(user as any)[column]}</td>
                 ))}
-                {(role === 'admin' || role === 'editor') && (
+                {(userRole === 'admin' || userRole === 'editor') && (
                   <td>
                     <button onClick={() => handleEditUser(user)}>Edit</button>
-                    {role === 'admin' && <button onClick={() => handleDelete(user.id)}>Delete</button>}
+                    {userRole === 'admin' && (
+                      <button onClick={() => handleDelete(user.id)}>Delete</button>
+                    )}
                   </td>
                 )}
               </tr>

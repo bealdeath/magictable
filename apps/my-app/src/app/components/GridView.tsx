@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   useTable,
@@ -24,7 +23,7 @@ interface Data {
 }
 
 interface GridViewProps {
-  columns: Column<Data>[];
+  columns: Column<Data>[]; // Ensure columns is included in GridViewProps
   data: Data[];
   updateMyData: (rowIndex: number, columnId: string, value: string) => void;
   setColumns?: React.Dispatch<React.SetStateAction<Column<Data>[]>>;
@@ -36,15 +35,54 @@ const DraggableHeader: React.FC<{
   moveColumn: (dragIndex: number, hoverIndex: number) => void;
 }> = ({ column, index, moveColumn }) => {
   const ref = React.useRef<HTMLDivElement>(null);
+
   const [, drop] = useDrop({
     accept: 'column',
-    hover: (item: { index: number }) => {
-      if (item.index !== index) {
-        moveColumn(item.index, index);
-        item.index = index;
+    hover: (item: { index: number }, monitor) => {
+      if (!ref.current) {
+        return;
       }
+      const dragIndex = item.index;
+      const hoverIndex = index;
+
+      // Don't replace items with themselves
+      if (dragIndex === hoverIndex) {
+        return;
+      }
+
+      // Determine rectangle on screen
+      const hoverBoundingRect = ref.current?.getBoundingClientRect();
+
+      // Get horizontal middle
+      const hoverMiddleX = (hoverBoundingRect.right - hoverBoundingRect.left) / 2;
+
+      // Determine mouse position
+      const clientOffset = monitor.getClientOffset();
+
+      // Get pixels to the left
+      const hoverClientX = clientOffset!.x - hoverBoundingRect.left;
+
+      // Only perform the move when the mouse has crossed half of the items width
+      // When dragging right, only move when the cursor is past 50%
+      // When dragging left, only move when the cursor is less than 50%
+      if (dragIndex < hoverIndex && hoverClientX < hoverMiddleX) {
+        return;
+      }
+      if (dragIndex > hoverIndex && hoverClientX > hoverMiddleX) {
+        return;
+      }
+
+      // Time to actually perform the action
+      moveColumn(dragIndex, hoverIndex);
+
+      // Note: we're mutating the monitor item here!
+      // Generally it's better to avoid mutations,
+      // but it's good here for the sake of performance
+      // to avoid expensive index searches.
+      item.index = hoverIndex;
     },
   });
+
   const [{ isDragging }, drag] = useDrag({
     type: 'column',
     item: { index },
@@ -57,6 +95,7 @@ const DraggableHeader: React.FC<{
   return (
     <div
       ref={ref}
+      className={isDragging ? 'is-dragging' : ''}
       style={{
         opacity: isDragging ? 0.5 : 1,
         cursor: 'move',
@@ -73,6 +112,7 @@ const DraggableHeader: React.FC<{
     </div>
   );
 };
+
 
 const EditableCell: React.FC<CellProps<Data> & { updateMyData: (rowIndex: number, columnId: string, value: string) => void }> = ({
   value: initialValue,
@@ -92,7 +132,6 @@ const EditableCell: React.FC<CellProps<Data> & { updateMyData: (rowIndex: number
 
   return <input value={value} onChange={onChange} onBlur={onBlur} />;
 };
-
 
 const GridView: React.FC<GridViewProps> = ({ columns, data, updateMyData, setColumns }) => {
   const navigate = useNavigate();
@@ -201,4 +240,3 @@ const GridView: React.FC<GridViewProps> = ({ columns, data, updateMyData, setCol
 };
 
 export default GridView;
-

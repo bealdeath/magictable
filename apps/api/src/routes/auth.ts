@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { User } from '../models';
 import { Op } from 'sequelize'; // Import Op from sequelize
+import authenticateJWT from '../middleware/authenticateJWT'; // Import JWT middleware
+import verifyRole from '../middleware/verifyRole'; // Import RBAC middleware
 
 const router = express.Router();
 
@@ -79,7 +81,7 @@ router.post('/login', async (req: Request, res: Response) => {
 });
 
 // Fetch all users with sorting and pagination
-router.get('/users', async (req: Request, res: Response) => {
+router.get('/users', authenticateJWT, verifyRole(['admin', 'editor']), async (req: Request, res: Response) => {
   try {
     const { sortField = 'id', sortOrder = 'ASC', page = 1, search = '' } = req.query;
     const limit = 10;
@@ -108,8 +110,8 @@ router.get('/users', async (req: Request, res: Response) => {
   }
 });
 
-// Add new user
-router.post('/users', async (req: Request, res: Response) => {
+// Add new user (Admins only)
+router.post('/users', authenticateJWT, verifyRole(['admin']), async (req: Request, res: Response) => {
   try {
     const { firstName, lastName, email, role } = req.body;
 
@@ -131,8 +133,8 @@ router.post('/users', async (req: Request, res: Response) => {
   }
 });
 
-// Edit user
-router.put('/users/:id', async (req: Request, res: Response) => {
+// Edit user (Admins and Editors)
+router.put('/users/:id', authenticateJWT, verifyRole(['admin', 'editor']), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { firstName, lastName, email, role } = req.body;
@@ -156,8 +158,8 @@ router.put('/users/:id', async (req: Request, res: Response) => {
   }
 });
 
-// Delete user
-router.delete('/users/:id', async (req: Request, res: Response) => {
+// Delete user (Admins only)
+router.delete('/users/:id', authenticateJWT, verifyRole(['admin']), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 

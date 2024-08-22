@@ -1,15 +1,13 @@
-// C:\Users\Andy\Downloads\testing\my-workspace\apps\api\src\models\user.ts
 import { Sequelize, Model, DataTypes } from 'sequelize';
 import bcrypt from 'bcrypt';
 
-// Make sure process.env.DB_URI is defined
 if (!process.env.DB_URI) {
   throw new Error("DB_URI environment variable is not defined");
 }
 
 const sequelize = new Sequelize(process.env.DB_URI, {
   dialect: 'postgres',
-  logging: false, // Add other options if necessary
+  logging: false,
 });
 
 export class User extends Model {
@@ -50,7 +48,8 @@ export class User extends Model {
       },
       role: {
         type: DataTypes.ENUM('admin', 'editor', 'viewer', 'user'),
-        allowNull: false
+        allowNull: false,
+        defaultValue: 'user', // Default role
       },
       isAdmin: {
         type: DataTypes.BOOLEAN,
@@ -86,3 +85,5 @@ export class User extends Model {
     });
   }
 }
+
+User.initModel(sequelize);
